@@ -1,0 +1,42 @@
+323CA,Bucur Ionut-Cristian-Tema3 PC-Proxy HTTP/1.0
+
+Workflowul acestui proxy este unul asemanator proxy-urilor in general, anume:
+
+-se porneste proxyul
+
+-acesta initializeaza sisteul de cache(creeaza folderul de cache daca nu exista
+deja sau STERGE fisirele din folder in cazul in care acesta exista deja),so
+nu e o idee grozava ca executabilul sa se afle langa un folder numit cache
+in care exista alte lucruri ce nu se vor disparute ca Elodia
+
+-proxyul creaza un listener pe TCP pe care asculta pentru conexiuni(requesturi)
+
+-un client(browserul,etc) trimite un request de tip HTTP/1.0(in cel mai bun caz)
+
+-proxyul accepta aceasta conexiune si deschide un thread nou pe care se intampla
+magia, astfel putem primi un numar relativ "nelimitat" de requesturi in paralel
+fara ca Sorin din Romania, care vroia sa se uite pe www.pisicutze.ro sa astepte
+dupa Jamal din America care a intrat pe un thread de /b pe 4chan
+
+-proxyul ia requestul si il salveaza intr-un vector stl de stringuri in care
+un element reprezinta un cuvat/text dintre spatii/si sau \r\n (ex. de componenta:
+"GET","http://elf.cs.pub.ro/", "HTTP/1.0")
+
+-proxyul verifica daca requestul este unul bun, conform RFC-ului(vezi check_request)
+si trimite un mesaj de 400 in cazul in care requestul nu este bun
+
+-proxyul extrage informatii precum adresa serverului web sub forma de domeniu,
+cale spre resursa ceruta, portul daca este specificat si daca este sau nu un
+request de tip POST
+
+-proxyul verifica daca resursa ceruta nu exista deja in cache, caz in care
+acesta este trimisa spre client, conexiunea cu acesta inchisa si deasemenea si
+threadul
+
+-proxyul resolva adresa serverului facand astfel rost de ipul acesteia si
+deschide o conexiune noua spre acesta. In continuare trimite requestul primit
+initial si salveaza raspunsul daca acesta are statusul 200 OK si daca nu requestul
+nu a fost de tip POST
+
+-proxyul trimite raspunsul primit de la serverul Web la client si inchide aceste
+conexiuni, de asemenea inchizand si threadul respectiv
